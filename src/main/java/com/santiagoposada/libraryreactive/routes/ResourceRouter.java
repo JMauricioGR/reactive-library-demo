@@ -35,7 +35,7 @@ public class ResourceRouter {
 
     @Bean
     public RouterFunction<ServerResponse> getAllRouter(GetAllUseCase getAllUseCase){
-        return route(GET("user.name"),
+        return route(GET("/resources"),
                 request -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(getAllUseCase.get(), ResourceDTO.class)));
