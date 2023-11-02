@@ -1,8 +1,7 @@
 package com.santiagoposada.libraryreactive.routes;
 
 import com.santiagoposada.libraryreactive.dto.ResourceDTO;
-import com.santiagoposada.libraryreactive.entity.Resource;
-import com.santiagoposada.libraryreactive.usecase.CreateResourceUseCase;
+import com.santiagoposada.libraryreactive.usecase.UpdateUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,14 +15,14 @@ import reactor.test.StepVerifier;
 import java.time.LocalDate;
 
 @SpringBootTest
-public class CreateRouteTest {
+public class UpdateResourceRouteTest {
 
     @MockBean
-    private CreateResourceUseCase createResourceUseCase;
+    private UpdateUseCase updateUseCase;
 
     @Test
-    @DisplayName("Create resource route")
-    void createResourceRouteTest(){
+    @DisplayName("Update resource route")
+    void updateResourceRouteTest(){
 
         // Arrange
         ResourceDTO resource = new ResourceDTO();
@@ -37,22 +36,23 @@ public class CreateRouteTest {
         resource.setUnitsAvailable(8);
 
         // Act
-        Mockito.when(createResourceUseCase.apply(resource))
+        Mockito.when(updateUseCase.apply(resource))
                 .thenReturn(Mono.just(resource));
 
-        var webTestClient = WebTestClient.bindToRouterFunction(new ResourceRouter().createResourceRoute(createResourceUseCase))
-                        .build();
+        var webTestClient = WebTestClient.bindToRouterFunction(new ResourceRouter()
+                                                                        .updateResourceRoute(updateUseCase))
+                                        .build();
 
-        //Assert
-        webTestClient.post()
-                .uri("/create")
+        // Assert
+        webTestClient.put()
+                .uri("/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(resource), ResourceDTO.class)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ResourceDTO.class)
-                .value(result ->{
-                    StepVerifier.create(createResourceUseCase.apply(result))
+                .value(result -> {
+                    StepVerifier.create(updateUseCase.apply(result))
                             .expectNext(resource)
                             .expectComplete()
                             .verify();
