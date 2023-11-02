@@ -15,17 +15,17 @@ import reactor.test.StepVerifier;
 import java.time.LocalDate;
 
 @SpringBootTest
-public class GetByCategoryUseCaseTest {
+public class GetByTypeUseCaseTest {
 
     @MockBean
     private ResourceRepository resourceRepository;
 
     @SpyBean
-    private GetByCategoryUseCase getByCategoryUseCase;
+    private GetByTypeUseCase getByTypeUseCase;
 
     @Test
-    @DisplayName("Get by category")
-    void getByCategoryUseCaseTest(){
+    @DisplayName("Get by type")
+    void getByTypeUseCaseTest(){
 
         // Arrange
         Resource resource = new Resource();
@@ -42,7 +42,7 @@ public class GetByCategoryUseCaseTest {
 
         resource2.setId("ccc222ddd");
         resource2.setName("Biology 1");
-        resource2.setCategory("Biological 1");
+        resource2.setCategory("Biological");
         resource2.setType("Type 2");
         resource2.setLastBorrow(LocalDate.parse("2023-11-02"));
         resource2.setUnitsOwed(1);
@@ -62,7 +62,7 @@ public class GetByCategoryUseCaseTest {
 
         resource2DTO.setId("ccc222ddd");
         resource2DTO.setName("Biology 1");
-        resource2DTO.setCategory("Biological 1");
+        resource2DTO.setCategory("Biological");
         resource2DTO.setType("Type 2");
         resource2DTO.setLastBorrow(LocalDate.parse("2023-11-02"));
         resource2DTO.setUnitsOwed(1);
@@ -71,18 +71,17 @@ public class GetByCategoryUseCaseTest {
         Flux<Resource> resourceResponse = Flux.just(resource, resource2);
 
         // Act
-        Mockito.when(resourceRepository.findAllByCategory(resourceDTO.getCategory()))
-                .thenReturn(resourceResponse.filter(response -> response.getCategory().equals(resourceDTO.getCategory())));
+        Mockito.when(resourceRepository.findAllByType(resourceDTO.getType()))
+                .thenReturn(resourceResponse
+                        .filter(result -> result.getType()
+                                .equals(resourceDTO.getType())));
 
         //Assert
-        Flux<ResourceDTO> result = getByCategoryUseCase.apply(resourceDTO.getCategory());
+        Flux<ResourceDTO> result = getByTypeUseCase.apply(resourceDTO.getType());
 
         StepVerifier.create(result)
-                .expectNextMatches(response -> response.getCategory()
-                                                       .equals(resourceDTO.getCategory()))
+                .expectNextMatches(response -> response.getType().equals(resourceDTO.getType()))
                 .expectComplete()
                 .verify();
-
     }
-
 }
