@@ -43,6 +43,7 @@ public class CreateRouteTest {
         var webTestClient = WebTestClient.bindToRouterFunction(new ResourceRouter().createResourceRoute(createResourceUseCase))
                         .build();
 
+        //Assert
         webTestClient.post()
                 .uri("/create")
                 .contentType(MediaType.APPLICATION_JSON)
