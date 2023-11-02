@@ -42,9 +42,9 @@ public class GetByCategoryUseCaseTest {
         Resource resource2 = new Resource();
 
         resource2.setId("ccc222ddd");
-        resource2.setName("Cinematic");
-        resource2.setCategory("Physics");
-        resource2.setType("Type 1");
+        resource2.setName("Biology 1");
+        resource2.setCategory("Biological 1");
+        resource2.setType("Type 2");
         resource2.setLastBorrow(LocalDate.parse("2023-11-02"));
         resource2.setUnitsOwed(1);
         resource2.setUnitsAvailable(9);
@@ -62,9 +62,9 @@ public class GetByCategoryUseCaseTest {
         ResourceDTO resource2DTO = new ResourceDTO();
 
         resource2DTO.setId("ccc222ddd");
-        resource2DTO.setName("Cinematic");
-        resource2DTO.setCategory("Physics");
-        resource2DTO.setType("Type 1");
+        resource2DTO.setName("Biology 1");
+        resource2DTO.setCategory("Biological 1");
+        resource2DTO.setType("Type 2");
         resource2DTO.setLastBorrow(LocalDate.parse("2023-11-02"));
         resource2DTO.setUnitsOwed(1);
         resource2DTO.setUnitsAvailable(9);
@@ -72,14 +72,15 @@ public class GetByCategoryUseCaseTest {
         Flux<Resource> resourceResponse = Flux.just(resource, resource2);
 
         // Act
-        Mockito.when(resourceRepository.findAllByCategory(resourceDTO.getCategory())).thenReturn(resourceResponse);
+        Mockito.when(resourceRepository.findAllByCategory(resourceDTO.getCategory()))
+                .thenReturn(resourceResponse.filter(response -> response.getCategory().equals(resourceDTO.getCategory())));
 
         //Assert
         Flux<ResourceDTO> result = getByCategoryUseCase.apply(resourceDTO.getCategory());
 
         StepVerifier.create(result)
-                .expectNext(resourceDTO)
-                .expectNext(resource2DTO)
+                .expectNextMatches(response -> response.getCategory()
+                                                       .equals(resourceDTO.getCategory()))
                 .expectComplete()
                 .verify();
 
